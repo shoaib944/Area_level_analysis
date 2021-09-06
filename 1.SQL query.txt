@@ -1,0 +1,36 @@
+SQL query to fetch the required data: 
+
+SELECT plus.item_id,
+       plus.plus_tag,
+       i.NAME,
+       i.restaurant_id,
+       attr.rest_name,
+       attr.city,
+       attr.city_id,
+       attr.area,
+       availability
+FROM   (SELECT restaurant_id,
+               ( Sum(actual_open_duration) / Sum(ideal_open_duration) ) > 0.75
+               AS
+                      availability
+        FROM   restaurant_serviceability_slot
+        WHERE  dt BETWEEN CURRENT_DATE - 6 AND CURRENT_DATE
+        GROUP  BY 1) av
+       RIGHT JOIN restaurant_attributes attr
+               ON attr.restaurant_id = av.restaurant_id
+       RIGHT JOIN items i
+               ON attr.restaurant_id = i.restaurant_id
+       RIGHT JOIN plus_item_info plus
+               ON Cast(i.id AS VARCHAR) = plus.item_id
+WHERE  attr.city_id IN ( 3 )
+       AND plus.plus_tag = 'plus'; 
+
+
+four tables are used in this analysis: 
+1.	‘Restaurants attributes’ table to get restaurant id, name, city, city id and its area name
+2.	‘Plus ’ table to get item id and tag (tag has two categories plus and not plus)
+3.	‘Items’ table to get food item name
+4.	‘Serviceability’ table to get availability > 0.75 ( i.e restaurant is open 75% of its ideal time)
+
+‘Serviceability’ table has features : rest id ,actual open time, ideal open time and date.
+Availability of rest from serviceability table is obtained by dividing total duration of actual open time to the total duration of  ideal open time and applying filter on date for one week. Here we get data in terms of true or false based on its 75% availability.
