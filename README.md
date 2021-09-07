@@ -1,5 +1,4 @@
 # Area_level_analysis
-This is the real-world project performed in my previous company.
 
 Area level analysis: Finding the area level insights of on-boarded restaurants to the newly launched platform called health-hub.
 
